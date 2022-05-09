@@ -1,4 +1,9 @@
 
+import math
+from statistics import median
+import sys
+
+
 max_x = 0
 max_y = 0
 
@@ -11,7 +16,9 @@ starting_y = 0
 
 def parse_input(input):
    
-    lines = input
+    lines = input.split("\n")
+    # Rimuovo l'ultima linea poichè vuota
+    lines.pop()
 
     size = lines[0].split(" ")
     global max_x, max_y, number_of_monuments, monuments_scheme
@@ -22,7 +29,7 @@ def parse_input(input):
 
     number_of_monuments = int(lines[1])
 
-    monument_lines = input[2:]
+    monument_lines = lines[2:]
 
     for coordinate_literal in monument_lines:
         split = coordinate_literal.split(" ")
@@ -41,18 +48,17 @@ def parse_input(input):
 # e molto lontana da altri
 
 def calc_starting_point(monuments):
-    sum = 0
-    count = 0
-    # Per ogni posizione x lungo la quale(verticalmente) si distribuiscono i monumenti, vado a calcolare la mediana
+
+    y_coordinates = []
+
+    # Calcolo la mediana considerando le y estreme di ogni x(min and max y)
     for key in monuments:
         y_array = sorted(monuments[key])
-        mean = y_array[len(y_array)//2]
-        
-        sum += mean
-        count += 1
+        y_coordinates.append(y_array[0])
+        y_coordinates.append(y_array[-1])
 
     # Restituisco la media delle mediane calcolate
-    return (sum//count)
+    return int(median(y_coordinates))
 
 
 def calc_path(starting_point, monuments):
@@ -79,7 +85,7 @@ def calc_path(starting_point, monuments):
         # I monumenti si trovano sotto la nostra strada(prende la distanza tra il monumento più in basso e la nostra strada)
         elif max_y < starting_point:
             path += (starting_point - min_y) * 2
-
+    
     # Aggiungiamo lo spazio percorso orizzontalmente(la lunghezza orizzontale della strada stessa)
     # max_x è il numero di nodi della griglia, la lunghezza totale sarà, quindi, più piccola di 1  ------> .___.___.___. -> 4 nodi, ma 3 segmenti
     path += max_x - 1
@@ -87,15 +93,25 @@ def calc_path(starting_point, monuments):
     return path
 
 
+text = sys.stdin.read()
 
-with open("Problem_45/input1_2.txt", "r") as f:
-    input = f.readlines()
+parse_input(text)
 
-    parse_input(input)
+starting_y = calc_starting_point(monuments_scheme)
 
-    starting_y = calc_starting_point(monuments_scheme)
+path = calc_path(starting_y, monuments_scheme)
 
-    path = calc_path(starting_y, monuments_scheme)
+print(path)
 
-    print(path)
+
+# with open("Problem_45/input1_2.txt", "r") as f:
+#     input = f.readlines()
+
+#     parse_input(input)
+
+#     starting_y = calc_starting_point(monuments_scheme)
+
+#     path = calc_path(starting_y, monuments_scheme)
+
+#     print(path)
 
